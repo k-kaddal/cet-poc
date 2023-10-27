@@ -1,0 +1,14 @@
+{
+  "name": "cet-poc",
+  "version": "1.0.0",
+  "main": "index.js",
+  "repository": "https://github.com/k-kaddal/cet-poc.git",
+  "workspaces": [
+    "packages/*"
+  ],
+  "scripts": {
+    "build-smart": "yarn workspace smart-contract run build"
+  },
+  "author": "k-kaddal <khaledkaddal@gmail.com>",
+  "license": "MIT"
+}
