@@ -1,0 +1,26 @@
+{
+  "name": "smart-contract",
+  "version": "1.0.0",
+  "main": "index.js",
+  "license": "MIT",
+  "scripts": {
+    "build": "truffle compile",
+    "migrate": "truffle migrate",
+    "test": "truffle test",
+    "local": "truffle develop --log",
+    "dev": "npm run migrate --development",
+    "deploy:goerli": "truffle migrate --network goerli",
+    "deploy:mumbai": "truffle migrate --network mumbai",
+    "deploy:sepolia": "truffle migrate --network sepolia",
+    "verify": "truffle run verify 0x6c53e7BBE00037c9a468d8ec9339Dda78902A28C --network sepolia"
+  },
+  "dependencies": {
+    "@openzeppelin/contracts": "^5.0.0",
+    "@truffle/hdwallet-provider": "^2.1.15",
+    "dotenv": "^16.3.1",
+    "truffle": "^5.11.5"
+  },
+  "devDependencies": {
+    "truffle-plugin-verify": "^0.6.5"
+  }
+}
