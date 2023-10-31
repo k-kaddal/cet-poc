@@ -1,7 +1,7 @@
 export const config = {
   "0x539": {
     name: "Localhost 9545",
-    contractAddress: "0x86BdC8D01513068e4F3AbFef6c925AcE1d9546dB",
+    contractAddress: "0xad0a0A071fb3D3683c7918DB3893ECA2cCDb13f6",
     symbol: "ETH",
     blockExplorer: null, // leave null for testing
     rpcUrl: `http://localhost:9545`,
@@ -15,7 +15,7 @@ export const config = {
   },
   "0x13881": {
     name: "Mumbai",
-    contractAddress: "0x99b65cF287740a863D2B5E74270D867316921521",
+    contractAddress: "",
     symbol: "MATIC",
     blockExplorer: "https://mumbai.polygonscan.com",
     rpcUrl: "https://rpc-mumbai.maticvigil.com",

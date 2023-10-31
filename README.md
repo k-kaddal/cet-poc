@@ -16,3 +16,10 @@ Tips:
 - The customer brief is unclear on purpose. Think ahead about the interrogations and expectations of the customer (eg: why not use Linea for my dApp?)
 
 - There is no right or wrong answer, you are here to demostrate your strengths (and not expose you weakness too much)
+
+---
+
+`nvm use 18.16` : to unify node version
+`yarn install` : this will install all dependecies of the mono-repo
+`yarn build-contract`: this will build the smart contract
+`yarn start-web`: start front-end

@@ -4,6 +4,7 @@ import Head from "next/head";
 import Navigation from "../components/Navigation";
 import Loans from "../components/loans/Loans";
 import LoansOwned from "../components/loans/LoansOwned";
+import { ethers } from "ethers";
 
 const Mint: NextPage = () => {
   const bigNumberify = (amt: string) => ethers.utils.parseEther(amt);
@@ -36,7 +37,7 @@ const Mint: NextPage = () => {
       </Head>
       <Navigation />
       <Loans loans={loans} />
-      <LoansOwned />
+      {/* <LoansOwned /> */}
     </div>
   );
 };

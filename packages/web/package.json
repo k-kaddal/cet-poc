@@ -1,7 +1,6 @@
 {
   "name": "web",
-  "version": "0.0.0",
-  "private": true,
+  "version": "0.0.1",
   "scripts": {
     "dev": "next dev",
     "build": "next build",
@@ -10,7 +9,7 @@
   },
   "dependencies": {
     "@metamask/sdk": "^0.1.0",
-    "blockchain": "*",
+    "smart-contract": "^0.0.1",
     "ethers": "^5.7.2",
     "next": "^13.2.4",
     "normalize.css": "^8.0.1",
