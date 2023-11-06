@@ -1,7 +1,7 @@
 export const config = {
   "0x539": {
     name: "Localhost 9545",
-    contractAddress: "0xad0a0A071fb3D3683c7918DB3893ECA2cCDb13f6",
+    contractAddress: "0xCfdC245Dce4103Ce03B7c5a910c5c0bc19Ae670B",
     symbol: "ETH",
     blockExplorer: null, // leave null for testing
     rpcUrl: `http://localhost:9545`,

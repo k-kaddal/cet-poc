@@ -1,67 +1,89 @@
 // SPDX-License-Identifier: MIT
-pragma solidity ^0.8.20;
+pragma solidity ^0.8.0;
 
-// Import OpenZeppelin for and Ownable
-import "@openzeppelin/contracts/access/Ownable.sol";
+import "@openzeppelin/contracts/token/ERC721/IERC721.sol";
+import "@openzeppelin/contracts/token/ERC20/IERC20.sol";
 
-contract LoanContract is Ownable {
-    // Struct to represent a loan
-    struct Loan {
-        address borrower;
-        uint256 collateralAmount;
-        uint256 loanAmount;
-        uint256 dueDate;
-        bool repaid;
-    }
+contract LoanContract {
+    address public owner;
+    address payable public ethPool;
 
-    // Mapping from loan ID to Loan
+    // Mapping to track active loans
     mapping(uint256 => Loan) public loans;
 
-    uint256 public nextLoanId = 1;
+    // A struct to represent a loan
+    struct Loan {
+        address borrower;
+        uint256 amount;
+        uint256 duration;
+        uint256 startTime;
+        bool active;
+    }
 
-    // Events to log important contract actions
-    event LoanCreated(uint256 loanId, address borrower, uint256 collateralAmount, uint256 loanAmount, uint256 dueDate);
+    // Events to log important contract activities
+    event LoanCreated(uint256 loanId, address borrower, uint256 amount);
     event LoanRepaid(uint256 loanId);
+    event PoolToppedUp(uint256 amount);
 
-    constructor() Ownable(msg.sender) {}
 
-    // Function to create a new loan
-    function createLoan(uint256 _collateralAmount, uint256 _loanAmount, uint256 _dueDate) external payable{
-        require(_collateralAmount > 0, "Collateral amount must be greater than 0");
-        require(_loanAmount > 0, "Loan amount must be greater than 0");
-        require(_dueDate > block.timestamp, "Due date must be in the future");
+    // Modifier to restrict access to the contract owner
+    modifier onlyOwner() {
+        require(msg.sender == owner, "Only the owner can perform this action");
+        _;
+    }
 
-        // Transfer collateral from the borrower to the contract
-        require(msg.value == _collateralAmount, "Collateral value does not match the provided value");
+    constructor() {
+        owner = msg.sender;
+        ethPool = payable(address(this));
+    }
 
-        loans[nextLoanId] = Loan({
-            borrower: msg.sender,
-            collateralAmount: _collateralAmount,
-            loanAmount: _loanAmount,
-            dueDate: _dueDate,
-            repaid: false
-        });
+    // Function to allow a user to collateralize an NFT and borrow money
+    function borrowLoan(uint256 amount, uint256 duration) external  {
 
-        // Emit a LoanCreated event
-        emit LoanCreated(nextLoanId, msg.sender, _collateralAmount, _loanAmount, _dueDate);
+        // // Transfer ETH from the pool to the borrower
+        // require(ethPool.balance >= amount, "Not enough ETH in the pool");
+        // payable(msg.sender).transfer(amount);
 
-        nextLoanId++;
+        // Create a new loan
+        uint256 loanId = uint256(keccak256(abi.encodePacked(msg.sender, block.number, block.timestamp)));
+        
+        loans[loanId] = Loan(msg.sender, amount, duration, block.timestamp, true);
+
+        emit LoanCreated(loanId, msg.sender, amount);
+    }
+
+    function borrow() external returns (uint256){
+        return (1);
     }
 
     // Function to repay a loan
-    function repayLoan(uint256 loanId) external payable {
+    function repayLoan(uint256 loanId) external payable{
         Loan storage loan = loans[loanId];
+        require(loan.active, "Loan is not active");
+        require(msg.sender == loan.borrower, "Only the borrower can repay the loan");
 
-        require(loan.borrower == msg.sender, "Only the borrower can repay the loan");
-        require(!loan.repaid, "Loan has already been repaid");
-        require(msg.value == loan.loanAmount, "Amount sent does not match the loan amount");
+        // Calculate the total repayment amount including interest
+        uint256 endTime = loan.startTime + loan.duration;
+        require(block.timestamp <= endTime, "Loan duration has expired");
+        
+        require(msg.value >= loan.amount, "Insufficient ETH sent for repayment");
 
-        loan.repaid = true;
+        // Transfer the repayment to the contract owner
+        payable(ethPool).transfer(msg.value);
 
-        // Transfer the collateral back to the borrower
-        payable(msg.sender).transfer(loan.collateralAmount);
+        // Mark the loan as repaid
+        loan.active = false;
 
-        // Emit a LoanRepaid event
         emit LoanRepaid(loanId);
     }
+
+    // Function to allow the owner to top up the ethPool with Ether
+    function topUpPool() external payable {
+        // Transfer the sent Ether to the ethPool
+        ethPool.transfer(msg.value);
+
+        // Emit an event to log the amount topped up
+        emit PoolToppedUp(msg.value);
+    }
+
 }

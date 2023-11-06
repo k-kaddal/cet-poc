@@ -1,8 +1,7 @@
 import { useState } from "react";
 import { useRouter } from "next/router";
 import { useMetaMask } from "../../hooks/useMetaMask";
-import { LoanContract3__factory } from "smart-contract";
-// import { ETHTickets__factory } from "smart-contract";
+import { LoanContract__factory } from "smart-contract";
 import { ethers } from "ethers";
 import { config, isSupportedNetwork } from "../../lib/config";
 
@@ -21,22 +20,12 @@ interface Loan {
   type: string;
   event: string;
   description: string;
-  price: string;
-  priceHexValue: string;
-  dueDate: string;
 }
 interface LoansProps {
   loans: Loan[];
 }
 
-const LoanTypes: React.FC<Loan> = ({
-  type,
-  event,
-  description,
-  price,
-  priceHexValue,
-  dueDate,
-}) => {
+const LoanTypes: React.FC<Loan> = ({ type, event, description }) => {
   const {
     state: { wallet },
   } = useMetaMask();
@@ -47,50 +36,13 @@ const LoanTypes: React.FC<Loan> = ({
   const [userDueDate, setUserDueDate] = useState("");
   const [userAmount, setUserAmount] = useState("");
 
-  // const mintLoan = async () => {
-  //   setIsMinting(true);
-
-  //   const provider = new ethers.providers.Web3Provider(window.ethereum);
-  //   const signer = provider.getSigner();
-
-  //   const factory = new ETHTickets__factory(signer);
-  //   const networkId = process.env.NEXT_PUBLIC_NETWORK_ID;
-
-  //   if (!isSupportedNetwork(networkId)) {
-  //     throw new Error(
-  //       "Set either `0x5` for goerli or `0x13881` for mumbai in apps/web/.env or .env.local"
-  //     );
-  //   }
-
-  //   const nftLoans = factory.attach(config[networkId].contractAddress);
-
-  //   nftLoans
-  //     .mintLoan({
-  //       from: wallet!,
-  //       value: priceHexValue,
-  //     })
-  //     .then(async (tx: any) => {
-  //       console.log("minting accepted");
-  //       await tx.wait(1);
-  //       console.log(`Minting complete, mined: ${tx}`);
-  //       setIsMinting(false);
-  //       router.reload();
-  //     })
-  //     .catch((error: any) => {
-  //       console.log(error);
-  //       setError(true);
-  //       setErrorMessage(error?.message);
-  //       setIsMinting(false);
-  //     });
-  // };
-
   const mintLoan = async () => {
     setIsMinting(true);
 
     const provider = new ethers.providers.Web3Provider(window.ethereum);
     const signer = provider.getSigner();
 
-    const factory = new LoanContract3__factory(signer);
+    const factory = new LoanContract__factory(signer);
     const networkId = process.env.NEXT_PUBLIC_NETWORK_ID;
 
     if (!isSupportedNetwork(networkId)) {
@@ -101,23 +53,21 @@ const LoanTypes: React.FC<Loan> = ({
 
     const contract = factory.attach(config[networkId].contractAddress);
 
-    try {
-      const bigNumberify = (amt: string) => ethers.utils.parseEther(amt);
-      const amount = bigNumberify("1")._hex;
-
-      console.log(amount);
-
-      await contract.topUpPool({ from: wallet, value: amount });
-    } catch (error) {
-      console.log(error);
-      throw new Error("Top up failed");
-    }
-
-    try {
-      await contract.borrowLoan(0.1, 1);
-    } catch (error) {
-      throw new Error("Borrow failed");
-    }
+    contract
+      .borrowLoan(userAmount, userDueDate)
+      .then(async (tx: any) => {
+        console.log("minting accepted");
+        await tx.wait(1);
+        console.log(`Minting complete, mined: ${tx}`);
+        setIsMinting(false);
+        router.reload();
+      })
+      .catch((error: any) => {
+        console.log(error);
+        setError(true);
+        setErrorMessage(error?.message);
+        setIsMinting(false);
+      });
   };
 
   const cantMint = !Boolean(wallet) && !isMinting;

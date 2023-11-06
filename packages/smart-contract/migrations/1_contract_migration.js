@@ -1,4 +1,4 @@
-const LoanContract = artifacts.require("LoanContract3");
+const LoanContract = artifacts.require("LoanContract");
 
 module.exports = function (deployer) {
   deployer.deploy(LoanContract);
